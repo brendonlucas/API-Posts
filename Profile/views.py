@@ -1,52 +1,49 @@
+from rest_framework.reverse import reverse
+
 from Posts.models import Post
 from Posts.serializers import PostSerializer
 from Profile.serializers import *
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from rest_framework import serializers
+from rest_framework import serializers, generics
 from Profile.models import *
 from rest_framework import status
 import json
 from Comment.models import *
 
 
-@api_view(['GET', 'POST'])
-def profile_list(request):
-    if request.method == 'GET':
-        # import_dados()
-        profiles = Profile.objects.all()
-        accounts_serializer = ProfileSerializer(profiles, many=True)
-        return Response(accounts_serializer.data)
-
-    elif request.method == 'POST':
-        profiles_serializer = ProfileSerializer(data=request.data)
-        if profiles_serializer.is_valid():
-            profiles_serializer.save()
-            return Response(profiles_serializer.data, status=status.HTTP_201_CREATED)
-        return Response(profiles_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+class ProfileList(generics.ListCreateAPIView):
+    queryset = Profile.objects.all()
+    serializer_class = ProfileSerializer
+    name = 'profile-list'
 
 
-@api_view(['GET', 'PUT', 'DELETE', 'POST'])
-def profile_detail(request, id):
-    try:
-        profile = Profile.objects.get(id=id)
-    except Profile.DoesNotExist:
-        return Response(status=status.HTTP_404_NOT_FOUND)
+class ProfileDetail(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Profile.objects.all()
+    serializer_class = ProfileSerializer
+    name = 'profile-detail'
 
-    if request.method == 'GET':
-        profile_serializer = ProfileSerializer(profile)
-        return Response(profile_serializer.data)
 
-    elif request.method == 'PUT':
-        profile_serializer = ProfileSerializer(Profile, data=request.data)
-        if profile_serializer.is_valid():
-            profile_serializer.save()
-            return Response(profile_serializer.data)
-        return Response(profile_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+class ProfilePostlist(generics.ListCreateAPIView):
+    queryset = Profile.objects.all()
+    serializer_class = ProfilePostSerializer
+    name = 'profile-post-list'
 
-    elif request.method == 'DELETE':
-        profile.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
+
+class ProfilePostDetail(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Profile.objects.all()
+    serializer_class = ProfilePostSerializer
+    name = 'profile-post-detail'
+
+
+class ApiRoot(generics.GenericAPIView):
+    name = 'api-root'
+
+    def get(self, request, *args, **kwargs):
+        return Response({
+            'profile-list': reverse(ProfileList.name, request=request),
+            'profile-post-list': reverse(ProfilePostlist.name, request=request),
+        }, status=status.HTTP_200_OK)
 
 
 def import_dados():
@@ -81,6 +78,49 @@ def import_dados():
         # Comment(name=name, email=email, body=body, postId=post_id).save()
 
 
+"""
+@api_view(['GET', 'POST'])
+def profile_list(request):
+    if request.method == 'GET':
+        # import_dados()
+        profiles = Profile.objects.all()
+        accounts_serializer = ProfileSerializer(profiles, many=True)
+        return Response(accounts_serializer.data)
+
+    elif request.method == 'POST':
+        profiles_serializer = ProfileSerializer(data=request.data)
+        if profiles_serializer.is_valid():
+            profiles_serializer.save()
+            return Response(profiles_serializer.data, status=status.HTTP_201_CREATED)
+        return Response(profiles_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+
+
+@api_view(['GET', 'PUT', 'DELETE', 'POST'])
+def profile_detail(request, id):
+    try:
+        profile = Profile.objects.get(id=id)
+    except Profile.DoesNotExist:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+
+    if request.method == 'GET':
+        profile_serializer = ProfileSerializer(profile)
+        return Response(profile_serializer.data)
+
+    elif request.method == 'PUT':
+        profile_serializer = ProfileSerializer(Profile, data=request.data)
+        if profile_serializer.is_valid():
+            profile_serializer.save()
+            return Response(profile_serializer.data)
+        return Response(profile_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    elif request.method == 'DELETE':
+        profile.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+
 @api_view(['GET', 'POST'])
 def profile_post_list(request):
     if request.method == 'GET':
@@ -99,3 +139,4 @@ def profile_post_detail(request, id):
     if request.method == 'GET':
         profile_serializer = ProfilePostSerializer(profile)
         return Response(profile_serializer.data)
+"""
