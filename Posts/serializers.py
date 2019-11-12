@@ -1,28 +1,18 @@
 from rest_framework import serializers
-from Posts.models import Post, Profile
-from Profile.serializers import ProfileSerializer
-from rest_framework import serializers
-
+from Comment.models import *
 from Posts.models import Post
-from Profile.models import *
 
 
-class PostSerializer(serializers.ModelSerializer):
+
+class CommentsSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Comment
+        fields = ['id', 'name', 'email', 'body']
+
+
+class PostCommentsSerializer(serializers.ModelSerializer):
+    comments = CommentsSerializer(many=True)
+
     class Meta:
         model = Post
-        fields = ['id', 'title', 'body']
-
-
-class AddressSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Address
-        fields = 'street', 'suite', 'city', 'zipcode'
-
-
-class ProfilePostSerializer(serializers.ModelSerializer):
-    posts = PostSerializer(many=True)
-    address = AddressSerializer(many=True)
-
-    class Meta:
-        model = Profile
-        fields = ['id', 'name', 'email', 'address', 'posts']
+        fields = ['userId', 'title', 'body', 'comments']
