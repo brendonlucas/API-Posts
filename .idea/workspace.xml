@@ -3,14 +3,9 @@
   <component name="ChangeListManager">
     <list default="true" id="a69b6ae7-c071-46d2-97ee-601ec5fdf54b" name="Default Changelist" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Comment/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/Comment/models.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Posts/serializers.py" beforeDir="false" afterPath="$PROJECT_DIR$/Posts/serializers.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Posts/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/Posts/urls.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Posts/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/Posts/views.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Profile/serializers.py" beforeDir="false" afterPath="$PROJECT_DIR$/Profile/serializers.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Profile/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/Profile/urls.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Profile/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/Profile/views.py" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/db.sqlite3" beforeDir="false" afterPath="$PROJECT_DIR$/db.sqlite3" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Comment/serializers.py" beforeDir="false" afterPath="$PROJECT_DIR$/Comment/serializers.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Comment/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/Comment/views.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/Post/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/Post/urls.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -46,7 +41,9 @@
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
   <component name="ProjectId" id="1SwmBkOiZrD83mF42oYavFi4J3B" />
-  <component name="ProjectLevelVcsManager" settingsEditedManually="true" />
+  <component name="ProjectLevelVcsManager" settingsEditedManually="true">
+    <ConfirmationsSetting value="1" id="Add" />
+  </component>
   <component name="PropertiesComponent">
     <property name="WebServerToolWindowFactoryState" value="false" />
     <property name="settings.editor.selected.configurable" value="vcs.Git" />
@@ -107,7 +104,8 @@
       <workItem from="1573174734778" duration="10284000" />
       <workItem from="1573218379868" duration="4271000" />
       <workItem from="1573515661961" duration="8527000" />
-      <workItem from="1573526672920" duration="286000" />
+      <workItem from="1573526672920" duration="974000" />
+      <workItem from="1573600793648" duration="8321000" />
     </task>
     <servers />
   </component>
