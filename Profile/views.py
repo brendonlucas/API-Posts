@@ -1,3 +1,5 @@
+from rest_framework.decorators import api_view
+
 from Posts.views import *
 from rest_framework.reverse import reverse
 from rest_framework.response import Response
@@ -6,6 +8,7 @@ from Profile.models import *
 from rest_framework import status
 from rest_framework import serializers, generics
 import json
+from rest_framework.views import APIView
 
 
 class ProfileList(generics.ListCreateAPIView):
@@ -32,6 +35,21 @@ class ProfilePostDetail(generics.RetrieveUpdateDestroyAPIView):
     name = 'profile-post-detail'
 
 
+@api_view(['GET'])
+def info(request):
+    if request.method == 'GET':
+        lista = []
+        profiles = Profile.objects.all()
+        for i in range(len(profiles)):
+            num_id = profiles[i].id
+            name = profiles[i].name
+            total_posts = len(Post.objects.filter(userId=num_id))
+            total_coments = len(Comment.objects.filter(postId__userId=num_id))
+            dic = {'id': num_id, 'name': name, 'total_posts': total_posts, 'total_coments': total_coments}
+            lista.append(dic)
+        return Response(lista)
+
+
 class ApiRoot(generics.GenericAPIView):
     name = 'api-root'
 
@@ -40,7 +58,7 @@ class ApiRoot(generics.GenericAPIView):
             'profile-list': reverse(ProfileList.name, request=request),
             'profile-post-list': reverse(ProfilePostlist.name, request=request),
             'post-comments-list': reverse(PostCommentslist.name, request=request),
-
+            'info': reverse('info', request=request)
         }, status=status.HTTP_200_OK)
 
 
