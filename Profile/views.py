@@ -1,3 +1,4 @@
+from django.contrib.auth.models import User
 from rest_framework.decorators import api_view
 
 from Posts.views import *
@@ -50,6 +51,18 @@ def info(request):
         return Response(lista)
 
 
+class UserList(generics.ListAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+    name = 'user-list'
+
+
+class UserDetail(generics.RetrieveAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+    name = 'user-detail'
+
+
 class ApiRoot(generics.GenericAPIView):
     name = 'api-root'
 
@@ -58,37 +71,44 @@ class ApiRoot(generics.GenericAPIView):
             'profile-list': reverse(ProfileList.name, request=request),
             'profile-post-list': reverse(ProfilePostlist.name, request=request),
             'post-comments-list': reverse(PostCommentslist.name, request=request),
-            'info': reverse('info', request=request)
+            'users': reverse(UserList.name, request=request),
+            'info': reverse('info', request=request),
+            'import-dados': reverse('import-dados', request=request),
         }, status=status.HTTP_200_OK)
 
+@api_view(['GET'])
+def import_dados(request):
+    if request.method == 'GET':
+        conteudo = open('db.json').read()
+        lista = json.loads(conteudo)
 
-def import_dados():
-    conteudo = open('db.json').read()
-    lista = json.loads(conteudo)
+        for j in range(len(lista['users'])):
+            n_id = lista['users'][j]['id']
+            name = lista['users'][j]['name']
+            email = lista['users'][j]['email']
+            endereco = lista['users'][j]['address']
+            street = endereco['street']
+            suite = endereco['suite']
+            city = endereco['city']
+            zipcode = endereco['zipcode']
+            a = Address(street=street, suite=suite, city=city, zipcode=zipcode)
+            a.save()
+            user = User.objects.get(id=1)
+            p = Profile(name=name, email=email, address=a, user_complement=user)
+            p.save()
 
-    for j in range(len(lista['users'])):
-        n_id = lista['users'][j]['id']
-        name = lista['users'][j]['name']
-        email = lista['users'][j]['email']
-        endereco = lista['users'][j]['address']
-        street = endereco['street']
-        suite = endereco['suite']
-        city = endereco['city']
-        zipcode = endereco['zipcode']
-        # a = Address(street=street, suite=suite, city=city, zipcode=zipcode)
-        # a.save()
-        # p = Profile(name=name, email=email, address=a)
-        # p.save()
+        for i in range(len(lista['posts'])):
+            user = Profile.objects.get(id=lista['posts'][i]['userId'])
+            titulo = lista['posts'][i]['title']
+            body = lista['posts'][i]['body']
+            user2 = User.objects.get(id=1)
+            Post(title=titulo, body=body, userId=user, owner=user2).save()
 
-    for i in range(len(lista['posts'])):
-        # user = Profile.objects.get(id=lista['posts'][i]['userId'])
-        titulo = lista['posts'][i]['title']
-        body = lista['posts'][i]['body']
-        # Post(title=titulo, body=body, userId=user).save()
+        for k in range(len(lista['comments'])):
+            post_id = Post.objects.get(id=lista['comments'][k]['postId'])
+            name = lista['comments'][k]['name']
+            email = lista['comments'][k]['email']
+            body = lista['comments'][k]['body']
+            Comment(name=name, email=email, body=body, postId=post_id).save()
 
-    for k in range(len(lista['comments'])):
-        # post_id = Post.objects.get(id=lista['comments'][k]['postId'])
-        name = lista['comments'][k]['name']
-        email = lista['comments'][k]['email']
-        body = lista['comments'][k]['body']
-        # Comment(name=name, email=email, body=body, postId=post_id).save()
+        return Response({'Importado com sucesso'}, status=status.HTTP_200_OK)

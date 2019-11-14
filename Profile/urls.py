@@ -1,4 +1,4 @@
-from django.urls import path
+from django.urls import path, include
 from Profile import views
 from Profile.views import *
 
@@ -11,4 +11,10 @@ urlpatterns = [
     path('profile-post/<int:pk>', ProfilePostDetail.as_view(), name=ProfilePostDetail.name),
 
     path('info/', views.info, name='info'),
+    path('import-dados/', views.import_dados, name='import-dados'),
+
+    path('users/', views.UserList.as_view(), name=views.UserList.name),
+
+    path('users/<int:pk>/', views.UserDetail.as_view(), name=views.UserDetail.name),
+    path('api-auth/', include('rest_framework.urls'))
 ]

@@ -1,4 +1,4 @@
-from rest_framework import generics, status
+from rest_framework import generics, status, permissions
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 
@@ -11,6 +11,8 @@ class CommentsPostlist(generics.RetrieveUpdateDestroyAPIView):
     queryset = Post.objects.all()
     serializer_class = PostCommentsSerializer
     name = 'comments-post-list'
+    permission_classes = (
+        permissions.IsAuthenticatedOrReadOnly,)
 
 
 @api_view(['GET', 'PUT', 'DELETE', 'POST'])

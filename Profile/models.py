@@ -1,3 +1,4 @@
+from django.contrib.auth.models import User
 from django.db import models
 
 
@@ -12,4 +13,5 @@ class Profile(models.Model):
     name = models.CharField(max_length=150)
     email = models.CharField(max_length=150)
     address = models.OneToOneField(Address, on_delete=models.CASCADE, related_name='address')
+    user_complement = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user_complement')
 

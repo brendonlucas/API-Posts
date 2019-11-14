@@ -35,7 +35,8 @@ class ProfileSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         name = validated_data.get('name')
         email = validated_data.get('email')
-        p = Profile(name=name, email=email)
+        user = User.objects.get(id=1)
+        p = Profile(name=name, email=email, user_complement=user)
 
         endereco = validated_data.get('address')
         street = endereco['street']
@@ -61,4 +62,7 @@ class ProfileSerializer(serializers.ModelSerializer):
         instance.save()
         address.save()
         return instance
+
+
+
 
