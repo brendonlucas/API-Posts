@@ -5,6 +5,7 @@ from rest_framework.response import Response
 from Comment.models import Comment
 from Comment.serializers import *
 from Posts.models import Post
+from Posts.permissions import IsOwnerOrReadOnly
 
 
 class CommentsPostlist(generics.RetrieveUpdateDestroyAPIView):
@@ -12,7 +13,7 @@ class CommentsPostlist(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = PostCommentsSerializer
     name = 'comments-post-list'
     permission_classes = (
-        permissions.IsAuthenticatedOrReadOnly,)
+        permissions.IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly)
 
 
 @api_view(['GET', 'PUT', 'DELETE', 'POST'])

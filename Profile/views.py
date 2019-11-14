@@ -69,6 +69,7 @@ class ApiRoot(generics.GenericAPIView):
     def get(self, request, *args, **kwargs):
         return Response({
             'profile-list': reverse(ProfileList.name, request=request),
+            'post-list': reverse(Postlist.name, request=request),
             'profile-post-list': reverse(ProfilePostlist.name, request=request),
             'post-comments-list': reverse(PostCommentslist.name, request=request),
             'users': reverse(UserList.name, request=request),
