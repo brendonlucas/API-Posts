@@ -8,15 +8,36 @@ from Posts.models import Post
 from Posts.permissions import IsOwnerOrReadOnly
 
 
-class CommentsPostlist(generics.RetrieveUpdateDestroyAPIView):
-    queryset = Post.objects.all()
-    serializer_class = PostCommentsSerializer
+class CommentsPostlist(generics.RetrieveAPIView):
+    queryset = Comment.objects.all()
+    serializer_class = CommentsSerializer
     name = 'comments-post-list'
     permission_classes = (
         permissions.IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly)
 
 
-@api_view(['GET', 'PUT', 'DELETE', 'POST'])
+@api_view(['GET', 'POST'])
+def commentslist(request, id_post):
+    try:
+        post = Post.objects.get(id=id_post)
+    except Post.DoesNotExist:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+
+    if request.method == 'GET':
+        comment_serializer = PostCommentsSerializer(post)
+        return Response(comment_serializer.data)
+
+    elif request.method == 'POST':
+        comment_serializer = CommentsSerializer(Comment, data=request.data)
+        if comment_serializer.is_valid():
+            comment = Comment(name=request.data['name'], email=request.data['email'], body=request.data['body'],
+                              postId=post)
+            comment.save()
+            return Response(request.data)
+        return Response(comment_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['GET', 'PUT', 'DELETE'])
 def comments_post_detail(request, id_post, id_comment):
     try:
         comment = Comment.objects.filter(postId=id_post)
@@ -34,7 +55,11 @@ def comments_post_detail(request, id_post, id_comment):
     elif request.method == 'PUT':
         comment_serializer = CommentsUpdateSerializer(Comment, data=request.data)
         if comment_serializer.is_valid():
-            comment_serializer.save()
+            comment.name = request.data['name']
+            comment.email = request.data['email']
+            comment.body = request.data['body']
+            comment.save()
+            print(request.data)
             return Response(request.data)
         return Response(comment_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
