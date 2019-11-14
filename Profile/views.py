@@ -1,4 +1,6 @@
 from django.contrib.auth.models import User
+from rest_framework.authtoken.models import Token
+from rest_framework.authtoken.views import obtain_auth_token, ObtainAuthToken
 from rest_framework.decorators import api_view
 
 from Posts.views import *
@@ -74,8 +76,11 @@ class ApiRoot(generics.GenericAPIView):
             'post-comments-list': reverse(PostCommentslist.name, request=request),
             'users': reverse(UserList.name, request=request),
             'info': reverse('info', request=request),
+            'get-Token': reverse('get-token', request=request),
             'import-dados': reverse('import-dados', request=request),
+
         }, status=status.HTTP_200_OK)
+
 
 @api_view(['GET'])
 def import_dados(request):
@@ -113,3 +118,17 @@ def import_dados(request):
             Comment(name=name, email=email, body=body, postId=post_id).save()
 
         return Response({'Importado com sucesso'}, status=status.HTTP_200_OK)
+
+
+class CustomAuthToken(ObtainAuthToken):
+    def post(self, request, *args, **kwargs):
+        serializer = self.serializer_class(data=request.data, context={'request': request})
+
+        serializer.is_valid(raise_exception=True)
+        user = serializer.validated_data['user']
+        token, created = Token.objects.get_or_create(user=user)
+        return Response({
+            'token': token.key,
+            'user_id': user.pk,
+            'email': user.email
+        })
