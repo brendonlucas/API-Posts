@@ -4,6 +4,14 @@ from Comment.models import *
 from Posts.models import Post
 
 
+class PostSerializers(serializers.ModelSerializer):
+    class Meta:
+        model = Post
+        fields = ['title', 'body', 'userId']
+
+
+
+
 class CommentsSerializer(serializers.ModelSerializer):
     class Meta:
         model = Comment
