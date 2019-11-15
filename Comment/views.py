@@ -4,7 +4,7 @@ from rest_framework.response import Response
 
 from Comment.models import Comment
 from Comment.serializers import *
-from Posts.models import Post
+from Posts.models import Post, Profile
 from Posts.permissions import IsOwnerOrReadOnly
 
 
@@ -28,13 +28,16 @@ def commentslist(request, id_post):
         return Response(comment_serializer.data)
 
     elif request.method == 'POST':
-        comment_serializer = CommentsSerializer(Comment, data=request.data)
-        if comment_serializer.is_valid():
-            comment = Comment(name=request.data['name'], email=request.data['email'], body=request.data['body'],
-                              postId=post)
-            comment.save()
-            return Response(request.data)
-        return Response(comment_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        if request.user.is_authenticated:
+            comment_serializer = CommentsSerializer(Comment, data=request.data)
+            if comment_serializer.is_valid():
+                comment = Comment(name=request.data['name'], email=request.data['email'], body=request.data['body'],
+                                  postId=post)
+                comment.save()
+                return Response(request.data)
+            return Response(comment_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            return Response({'User not authenticated'}, status=status.HTTP_401_UNAUTHORIZED)
 
 
 @api_view(['GET', 'PUT', 'DELETE'])
@@ -59,10 +62,18 @@ def comments_post_detail(request, id_post, id_comment):
             comment.email = request.data['email']
             comment.body = request.data['body']
             comment.save()
-            print(request.data)
             return Response(request.data)
         return Response(comment_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     elif request.method == 'DELETE':
-        comment.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
+        user = request.user
+        post = Post.objects.get(id=id_post)
+        if post.owner == user:
+            comment.delete()
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        else:
+            return Response({'Você não tem autorização para deletar o comentario'}, status=status.HTTP_401_UNAUTHORIZED)
+
+
+
+

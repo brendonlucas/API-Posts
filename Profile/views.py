@@ -1,8 +1,11 @@
+from datetime import date
+import datetime
 from django.contrib.auth.models import User
 from rest_framework.authtoken.models import Token
 from rest_framework.authtoken.views import obtain_auth_token, ObtainAuthToken
 from rest_framework.decorators import api_view
 
+from Posts.permissions import IsOwnerUserOrReadOnly
 from Posts.views import *
 from rest_framework.reverse import reverse
 from rest_framework.response import Response
@@ -18,6 +21,8 @@ class ProfileList(generics.ListCreateAPIView):
     queryset = Profile.objects.all()
     serializer_class = ProfileSerializer
     name = 'profile-list'
+    permission_classes = (
+        permissions.IsAuthenticated,)
 
 
 class ProfileDetail(generics.RetrieveUpdateDestroyAPIView):
@@ -25,17 +30,22 @@ class ProfileDetail(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = ProfileSerializer
     name = 'profile-detail'
 
+    permission_classes = (
+        permissions.IsAuthenticated, IsOwnerUserOrReadOnly,)
 
-class ProfilePostlist(generics.ListCreateAPIView):
+
+class ProfilePostlist(generics.ListAPIView):
     queryset = Profile.objects.all()
     serializer_class = ProfilePostSerializer
     name = 'profile-post-list'
 
 
-class ProfilePostDetail(generics.RetrieveUpdateDestroyAPIView):
+class ProfilePostDetail(generics.RetrieveAPIView):
     queryset = Profile.objects.all()
     serializer_class = ProfilePostSerializer
     name = 'profile-post-detail'
+    permission_classes = (
+        permissions.IsAuthenticatedOrReadOnly,)
 
 
 @api_view(['GET'])
@@ -90,6 +100,7 @@ def import_dados(request):
 
         for j in range(len(lista['users'])):
             n_id = lista['users'][j]['id']
+            username = lista['users'][j]['username']
             name = lista['users'][j]['name']
             email = lista['users'][j]['email']
             endereco = lista['users'][j]['address']
@@ -99,15 +110,17 @@ def import_dados(request):
             zipcode = endereco['zipcode']
             a = Address(street=street, suite=suite, city=city, zipcode=zipcode)
             a.save()
-            user = User.objects.get(id=1)
+            user = User.objects.create_user(username=username, password='123456789', email=email)
+
             p = Profile(name=name, email=email, address=a, user_complement=user)
             p.save()
 
         for i in range(len(lista['posts'])):
             user = Profile.objects.get(id=lista['posts'][i]['userId'])
+            user2 = user.user_complement
             titulo = lista['posts'][i]['title']
             body = lista['posts'][i]['body']
-            user2 = User.objects.get(id=1)
+            # user2 = User.objects.get(id=1)
             Post(title=titulo, body=body, userId=user, owner=user2).save()
 
         for k in range(len(lista['comments'])):
@@ -123,7 +136,6 @@ def import_dados(request):
 class CustomAuthToken(ObtainAuthToken):
     def post(self, request, *args, **kwargs):
         serializer = self.serializer_class(data=request.data, context={'request': request})
-
         serializer.is_valid(raise_exception=True)
         user = serializer.validated_data['user']
         token, created = Token.objects.get_or_create(user=user)
@@ -132,3 +144,6 @@ class CustomAuthToken(ObtainAuthToken):
             'user_id': user.pk,
             'email': user.email
         })
+
+
+

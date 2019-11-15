@@ -6,12 +6,14 @@ from Profile.models import Profile
 
 
 class Postlist(generics.ListCreateAPIView):
-    queryset = Post.objects.all()
+    queryset = Post.objects.all().order_by('userId')
     serializer_class = PostSerializers
     name = 'post-list'
     permission_classes = (permissions.IsAuthenticatedOrReadOnly,)
 
     def perform_create(self, serializer):
+        # user1 = Profile.objects.get(user_complement=self.request.user.id)
+        # serializer.save(userId=user1)
         serializer.save(owner=self.request.user)
 
 
@@ -24,7 +26,7 @@ class PostDetail(generics.RetrieveUpdateDestroyAPIView):
 
 
 class PostCommentslist(generics.ListCreateAPIView):
-    queryset = Post.objects.all()
+    queryset = Post.objects.all().order_by('userId')
     serializer_class = PostCommentsSerializer
     name = 'post-comments-list'
     permission_classes = (
