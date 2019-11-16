@@ -18,6 +18,7 @@ class CommentsPostlist(generics.RetrieveAPIView):
 
 @api_view(['GET', 'POST'])
 def commentslist(request, id_post):
+    print('entou')
     try:
         post = Post.objects.get(id=id_post)
     except Post.DoesNotExist:
@@ -47,7 +48,7 @@ def comments_post_detail(request, id_post, id_comment):
         if id_comment <= len(comment):
             comment = comment[id_comment - 1]
         else:
-            return Response(status=status.HTTP_404_NOT_FOUND)
+            return Response({'erro': '404_NOT_FOUND'}, status=status.HTTP_404_NOT_FOUND)
     except Comment.DoesNotExist:
         return Response(status=status.HTTP_404_NOT_FOUND)
 
@@ -70,7 +71,7 @@ def comments_post_detail(request, id_post, id_comment):
         post = Post.objects.get(id=id_post)
         if post.owner == user:
             comment.delete()
-            return Response(status=status.HTTP_204_NO_CONTENT)
+            return Response({'result': 'comment deleted'}, status=status.HTTP_204_NO_CONTENT)
         else:
             return Response({'Você não tem autorização para deletar o comentario'}, status=status.HTTP_401_UNAUTHORIZED)
 

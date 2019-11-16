@@ -1,15 +1,7 @@
 from django.contrib.auth.models import User
 from rest_framework import serializers
 from Comment.models import *
-from Posts.models import Post
-
-
-class PostSerializers(serializers.ModelSerializer):
-    class Meta:
-        model = Post
-        fields = ['title', 'body', 'userId']
-
-
+from Posts.models import Post, Profile
 
 
 class CommentsSerializer(serializers.ModelSerializer):
@@ -23,12 +15,24 @@ class PostCommentsSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Post
-        fields = ['userId', 'title', 'body', 'comments']
+        fields = ['profile', 'title', 'body', 'comments']
 
 
 class UserSerializer(serializers.HyperlinkedModelSerializer):
-    games = PostCommentsSerializer(many=True, read_only=True)
 
     class Meta:
         model = User
-        fields = ('url', 'pk', 'username', 'games')
+        fields = ('url', 'pk', 'username')
+
+
+class ProfileSerializers(serializers.HyperlinkedModelSerializer):
+    class Meta:
+        model = Profile
+        fields = ['name']
+
+class PostSerializers(serializers.ModelSerializer):
+    profile = ProfileSerializers()
+
+    class Meta:
+        model = Post
+        fields = [ 'profile', 'id', 'title', 'body']

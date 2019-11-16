@@ -57,7 +57,12 @@ REST_FRAMEWORK = {
         'rest_framework.authentication.BasicAuthentication',
         'rest_framework.authentication.SessionAuthentication',
         'rest_framework.authentication.TokenAuthentication',
-    )
+    ),
+    'DEFAULT_THROTTLE_CLASSES': (
+    ),
+    'DEFAULT_THROTTLE_RATES': {
+        'get-token': '1/hour',
+    }
 
 }
 ROOT_URLCONF = 'Post.urls'

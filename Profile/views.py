@@ -1,9 +1,11 @@
-from datetime import date
-import datetime
+from datetime import date, timedelta
+
+from datetime import datetime
 from django.contrib.auth.models import User
 from rest_framework.authtoken.models import Token
 from rest_framework.authtoken.views import obtain_auth_token, ObtainAuthToken
 from rest_framework.decorators import api_view
+from rest_framework.throttling import ScopedRateThrottle
 
 from Posts.permissions import IsOwnerUserOrReadOnly
 from Posts.views import *
@@ -56,8 +58,8 @@ def info(request):
         for i in range(len(profiles)):
             num_id = profiles[i].id
             name = profiles[i].name
-            total_posts = len(Post.objects.filter(userId=num_id))
-            total_coments = len(Comment.objects.filter(postId__userId=num_id))
+            total_posts = len(Post.objects.filter(profile=num_id))
+            total_coments = len(Comment.objects.filter(postId__profile=num_id))
             dic = {'id': num_id, 'name': name, 'total_posts': total_posts, 'total_coments': total_coments}
             lista.append(dic)
         return Response(lista)
@@ -121,7 +123,7 @@ def import_dados(request):
             titulo = lista['posts'][i]['title']
             body = lista['posts'][i]['body']
             # user2 = User.objects.get(id=1)
-            Post(title=titulo, body=body, userId=user, owner=user2).save()
+            Post(title=titulo, body=body, profile=user, owner=user2).save()
 
         for k in range(len(lista['comments'])):
             post_id = Post.objects.get(id=lista['comments'][k]['postId'])
@@ -145,5 +147,5 @@ class CustomAuthToken(ObtainAuthToken):
             'email': user.email
         })
 
-
-
+    throttle_scope = 'get-token'
+    throttle_classes = (ScopedRateThrottle,)
