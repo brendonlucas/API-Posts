@@ -1,5 +1,4 @@
 from datetime import date, timedelta
-
 from datetime import datetime
 from django.contrib.auth.models import User
 from rest_framework.authtoken.models import Token
@@ -31,7 +30,6 @@ class ProfileDetail(generics.RetrieveUpdateDestroyAPIView):
     queryset = Profile.objects.all()
     serializer_class = ProfileSerializer
     name = 'profile-detail'
-
     permission_classes = (
         permissions.IsAuthenticated, IsOwnerUserOrReadOnly,)
 
@@ -69,12 +67,16 @@ class UserList(generics.ListAPIView):
     queryset = User.objects.all()
     serializer_class = UserSerializer
     name = 'user-list'
+    permission_classes = (
+        permissions.IsAuthenticated,)
 
 
 class UserDetail(generics.RetrieveAPIView):
     queryset = User.objects.all()
     serializer_class = UserSerializer
     name = 'user-detail'
+    permission_classes = (
+        permissions.IsAuthenticated,)
 
 
 class ApiRoot(generics.GenericAPIView):
@@ -99,9 +101,7 @@ def import_dados(request):
     if request.method == 'GET':
         conteudo = open('db.json').read()
         lista = json.loads(conteudo)
-
         for j in range(len(lista['users'])):
-            n_id = lista['users'][j]['id']
             username = lista['users'][j]['username']
             name = lista['users'][j]['name']
             email = lista['users'][j]['email']
@@ -113,17 +113,15 @@ def import_dados(request):
             a = Address(street=street, suite=suite, city=city, zipcode=zipcode)
             a.save()
             user = User.objects.create_user(username=username, password='123456789', email=email)
-
             p = Profile(name=name, email=email, address=a, user_complement=user)
             p.save()
 
         for i in range(len(lista['posts'])):
             user = Profile.objects.get(id=lista['posts'][i]['userId'])
-            user2 = user.user_complement
+            owner = user.user_complement
             titulo = lista['posts'][i]['title']
             body = lista['posts'][i]['body']
-            # user2 = User.objects.get(id=1)
-            Post(title=titulo, body=body, profile=user, owner=user2).save()
+            Post(title=titulo, body=body, profile=user, owner=owner).save()
 
         for k in range(len(lista['comments'])):
             post_id = Post.objects.get(id=lista['comments'][k]['postId'])
@@ -131,7 +129,6 @@ def import_dados(request):
             email = lista['comments'][k]['email']
             body = lista['comments'][k]['body']
             Comment(name=name, email=email, body=body, postId=post_id).save()
-
         return Response({'Importado com sucesso'}, status=status.HTTP_200_OK)
 
 
@@ -146,6 +143,5 @@ class CustomAuthToken(ObtainAuthToken):
             'user_id': user.pk,
             'email': user.email
         })
-
     throttle_scope = 'get-token'
     throttle_classes = (ScopedRateThrottle,)

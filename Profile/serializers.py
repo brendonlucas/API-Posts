@@ -35,17 +35,17 @@ class ProfileSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         name = validated_data.get('name')
         email = validated_data.get('email')
-        user = User.objects.get(id=1)
-        p = Profile(name=name, email=email, user_complement=user)
-
         endereco = validated_data.get('address')
         street = endereco['street']
         suite = endereco['suite']
         city = endereco['city']
         zipcode = endereco['zipcode']
-        p.save()
-        a = Address(street=street, suite=suite, city=city, zipcode=zipcode, user=p)
+        a = Address(street=street, suite=suite, city=city, zipcode=zipcode)
         a.save()
+        user = User.objects.create_user(username=name, password='123456789', email=email)
+        p = Profile(name=name, email=email, address=a, user_complement=user)
+        p.save()
+
         return validated_data
 
     def update(self, instance, validated_data):

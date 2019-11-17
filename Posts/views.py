@@ -24,7 +24,7 @@ class PostDetail(generics.RetrieveUpdateDestroyAPIView):
         permissions.IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly)
 
 
-class PostCommentslist(generics.ListCreateAPIView):
+class PostCommentslist(generics.ListAPIView):
     queryset = Post.objects.all().order_by('profile')
     serializer_class = PostCommentsSerializer
     name = 'post-comments-list'
@@ -32,10 +32,9 @@ class PostCommentslist(generics.ListCreateAPIView):
         permissions.IsAuthenticatedOrReadOnly,)
 
 
-class PostCommentsDetail(generics.RetrieveUpdateDestroyAPIView):
+class PostCommentsDetail(generics.RetrieveAPIView):
     queryset = Post.objects.all()
     serializer_class = PostCommentsSerializer
     name = 'post-comments-detail'
-
     permission_classes = (
         permissions.IsAuthenticatedOrReadOnly, IsOwnerOrReadOnly)

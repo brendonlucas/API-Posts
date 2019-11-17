@@ -30,9 +30,9 @@ class ProfileSerializers(serializers.HyperlinkedModelSerializer):
         model = Profile
         fields = ['name']
 
+
 class PostSerializers(serializers.ModelSerializer):
-    profile = ProfileSerializers()
 
     class Meta:
         model = Post
-        fields = [ 'profile', 'id', 'title', 'body']
+        fields = ['id', 'title', 'body']
