@@ -12,5 +12,6 @@
 <pre> <code> $ pip install -r requirements.txt </code> </pre>
 
 <h3> Video demonstração </h3>
-
-<pre> <a href="https://youtu.be/g0tTtepXb54"> </a></pre>
+<ul>
+ <li> https://youtu.be/g0tTtepXb54 </li>
+</ul>
